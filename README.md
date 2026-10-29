@@ -7,9 +7,21 @@ of your desktop, on top of other windows. He waves, holds up a water bottle, and
 The character is original vector art (spiky dark hair, beige open hoodie, white tee, backpack straps,
 beige trousers, cream sneakers) drawn with SVG and CSS. It doesn't use any assets from the Reel.
 
-## Run it
+## Download (no setup needed)
+
+Get the latest version from the [Releases page](https://github.com/teddyashlin/Hydra/releases/latest):
+
+- **Hydra-Setup-1.0.0.exe**: installs Hydra and adds it to the Start menu. Recommended.
+- **Hydra-Portable-1.0.0.exe**: runs without installing, for example from a USB drive.
+
+The app isn't code-signed, so Windows may show *"Windows protected your PC"*. Click **More info → Run anyway**.
+
+## Run from source
 
 Requires [Node.js](https://nodejs.org) 18+.
+
+If PowerShell says `npm.ps1 cannot be loaded ... not digitally signed`, type `npm.cmd` instead of `npm`
+(e.g. `npm.cmd install`), or run the commands from **Command Prompt** instead of PowerShell.
 
 ```powershell
 cd C:\Users\tashlind\hydra-water-reminder
