@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Hydra reminder</title>
+<link rel="stylesheet" href="character.css">
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; user-select: none;
+    font-family: "Segoe UI", system-ui, sans-serif; color: #223b36; }
+  .stage { position: absolute; right: 40px; bottom: 0; width: 340px; height: 540px;
+    transform: translate3d(480px, 0, 0); visibility: hidden; will-change: transform; }
+  .guy { position: absolute; right: 70px; bottom: 4px; width: 180px; height: 324px; }
+
+  .bubble { position: absolute; right: 6px; bottom: 342px; width: 320px; box-sizing: border-box;
+    padding: 18px 18px 15px; background: #fffdf8; border: 1px solid #e6e2d6; border-radius: 22px;
+    box-shadow: 0 14px 40px rgba(31, 52, 45, .22); text-align: center;
+    opacity: 0; transform: translateY(14px) scale(.7); transform-origin: 62% 100%; pointer-events: none;
+    transition: opacity .2s ease, transform .38s cubic-bezier(.2, 1.5, .4, 1); }
+  .bubble::after { content: ""; position: absolute; bottom: -9px; right: 146px; width: 16px; height: 16px;
+    background: #fffdf8; border-right: 1px solid #e6e2d6; border-bottom: 1px solid #e6e2d6; transform: rotate(45deg); }
+  .bubble.show { opacity: 1; transform: none; pointer-events: auto; }
+  .msg { margin: 2px 16px 6px; font-size: 16px; font-weight: 700; line-height: 1.35; text-wrap: balance; }
+  .meta { margin: 0 0 13px; font-size: 12px; color: #71817a; }
+  .actions { display: flex; gap: 8px; justify-content: center; }
+  .actions.hidden { display: none; }
+  button { font: inherit; border: 0; cursor: pointer; }
+  .actions button { padding: 10px 15px; border-radius: 999px; font-size: 13px; font-weight: 700;
+    transition: transform .12s ease, background .15s ease; }
+  .actions button:hover { transform: translateY(-1px); }
+  .actions button:active { transform: scale(.97); }
+  .yes { background: #3f7d64; color: #fff; }
+  .yes:hover { background: #356c56; }
+  .later { background: #f0eee6; color: #4f6158; }
+  .later:hover { background: #e7e4da; }
+  .close { position: absolute; top: 8px; right: 10px; width: 26px; height: 26px; border-radius: 50%;
+    background: transparent; color: #8a978f; font-size: 13px; line-height: 26px; }
+  .close:hover { background: #f0eee6; color: #223b36; }
+
+  .splash { position: absolute; right: 196px; bottom: 300px; width: 1px; height: 1px; }
+  .splash i { position: absolute; width: 9px; height: 12px; background: #59b6e8;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; opacity: 0; }
+  .splash.go i { animation: splash .9s ease-out forwards; }
+  @keyframes splash {
+    0% { opacity: 1; transform: translate(0, 0) scale(.6); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bubble, .actions button { transition: none; }
+    .splash { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="bubble" id="bubble" role="alertdialog" aria-live="assertive" aria-labelledby="msg">
+      <button class="close" id="dismissBtn" title="Dismiss" aria-label="Dismiss">✕</button>
+      <p class="msg" id="msg">Time to drink some water! 💧</p>
+      <p class="meta" id="meta"></p>
+      <div class="actions" id="actions">
+        <button class="yes" id="yesBtn">Yes, I drank 💧</button>
+        <button class="later" id="laterBtn">Remind me later</button>
+      </div>
+    </div>
+    <div class="guy" id="guy"></div>
+    <div class="splash" id="splash"></div>
+  </div>
+  <script src="character.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>

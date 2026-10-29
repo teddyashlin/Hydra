@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Hydra — water reminder</title>
+<link rel="stylesheet" href="character.css">
+<style>
+  :root { --ink: #223b36; --muted: #71817a; --paper: #f5f2e9; --card: #fffdf7; --line: #e8e5da; --dark: #30483f; --accent: #3f7d64; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; }
+  .shell { max-width: 1120px; margin: auto; padding: 24px 28px 36px; }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+  .brand-mark { width: 34px; height: 34px; border-radius: 12px; background: #d7ebd4; display: grid; place-items: center; font-size: 18px; }
+  .date { color: var(--muted); font-size: 13px; }
+  .layout { display: grid; grid-template-columns: 1.05fr .95fr; gap: 20px; align-items: start; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 24px; box-shadow: 0 8px 30px rgba(41, 67, 57, .04); }
+
+  .hero { position: sticky; top: 20px; overflow: hidden; background: #e9efd9; display: flex; flex-direction: column;
+    height: clamp(560px, calc(100vh - 110px), 720px); }
+  .hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; opacity: .65; }
+  .hero::before { width: 280px; height: 280px; left: -95px; top: -135px; background: #d4e1c4; }
+  .hero::after { width: 240px; height: 240px; right: -110px; bottom: -120px; background: #dcebf0; }
+  .hero > * { position: relative; z-index: 1; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 1.5px; font-size: 10px; font-weight: 700; color: #758671; }
+  .hero h1 { font-size: clamp(26px, 3.4vw, 36px); line-height: 1.1; letter-spacing: -1.2px; margin: 8px 0 6px; max-width: 380px; }
+  .sub { color: #63746a; font-size: 14px; line-height: 1.5; margin: 0; max-width: 400px; }
+  .scene { flex: 1; position: relative; display: flex; align-items: flex-end; justify-content: center; min-height: 330px; }
+  .scene .guy { width: 160px; height: 288px; cursor: pointer; }
+  .scene .bubble { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); background: #fffdf8; border: 1px solid #e6e4da;
+    border-radius: 16px; padding: 11px 16px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(52, 75, 64, .1); white-space: nowrap; }
+  .scene .bubble::after { content: ""; position: absolute; bottom: -8px; left: 50%; width: 14px; height: 14px; background: #fffdf8;
+    border-right: 1px solid #e6e4da; border-bottom: 1px solid #e6e4da; transform: translateX(-50%) rotate(45deg); }
+  .hero-bottom { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: #55665c; font-size: 13px; flex-wrap: wrap; }
+  .live { display: flex; gap: 8px; align-items: center; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #b9b9ad; }
+  .dot.on { background: #6aa957; box-shadow: 0 0 0 4px rgba(106, 169, 87, .18); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .small-btn { padding: 9px 13px; background: #f8f7f1; border: 1px solid #e0e0d4; border-radius: 11px; color: #41564c; font-size: 12px; font-weight: 600; }
+  .small-btn:hover { background: #fff; }
+
+  .right { display: flex; flex-direction: column; gap: 20px; }
+  .section-title { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .hint { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+  .mode { display: flex; background: #f1f0e8; border-radius: 12px; padding: 4px; margin: 16px 0 4px; }
+  .mode button { flex: 1; padding: 9px 7px; border-radius: 9px; color: #768078; background: transparent; font-size: 12px; font-weight: 700; }
+  .mode button.active { background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(38, 61, 52, .07); }
+  .field-label { display: block; font-size: 12px; font-weight: 700; margin: 12px 0 6px; }
+  .control { width: 100%; padding: 10px 12px; border-radius: 11px; background: #fff; border: 1px solid #e0e0d6; outline: none; }
+  .control:focus { border-color: #83a990; box-shadow: 0 0 0 3px rgba(186, 212, 197, .35); }
+  .control.invalid { border-color: #d27a5f; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .note { font-size: 11px; color: #7d8981; margin-top: 6px; }
+  .note.error { color: #b5573b; }
+  .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-top: 14px; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #44564d; cursor: pointer; }
+  .toggle input { accent-color: var(--accent); width: 15px; height: 15px; }
+  .primary { width: 100%; margin-top: 16px; border-radius: 12px; background: var(--dark); color: #fff; padding: 12px; font-weight: 700; }
+  .primary:hover { background: #426353; }
+  .primary.paused { background: var(--accent); }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .stat { padding: 16px; border-radius: 17px; background: #f6f4ec; }
+  .stat:nth-child(2) { background: #eaf2e4; }
+  .stat-label { font-size: 11px; color: #718077; }
+  .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .stat-value small { font-size: 14px; color: var(--muted); font-weight: 600; }
+  .progress { height: 8px; border-radius: 99px; background: #e7e4d8; margin-top: 10px; overflow: hidden; }
+  .progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #7fd0f5, #2f86c4); border-radius: inherit; transition: width .4s ease; }
+  .sips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; min-height: 26px; }
+  .sip { font-size: 11px; padding: 4px 9px; border-radius: 99px; background: #e5f3fa; color: #2c6f97; }
+  .empty { font-size: 12px; color: var(--muted); }
+  .stats-actions { display: flex; gap: 8px; margin-top: 14px; }
+
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px); opacity: 0; background: #30483f; color: #fff;
+    padding: 11px 18px; border-radius: 12px; font-size: 13px; transition: .25s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  [hidden] { display: none !important; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } .hero { position: relative; top: 0; height: 560px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="top">
+    <div class="brand"><span class="brand-mark">💧</span>hydra</div>
+    <div class="date" id="today"></div>
+  </header>
+
+  <div class="layout">
+    <section class="panel hero">
+      <div class="eyebrow">A gentle nudge to pause</div>
+      <h1>Your little water buddy.</h1>
+      <p class="sub">He walks onto your desktop when it's time to sip. Close this window anytime — Hydra keeps running in the system tray.</p>
+      <div class="scene">
+        <div class="bubble">Time to drink some water! 💧</div>
+        <div class="guy" id="heroGuy" title="Say hi"></div>
+      </div>
+      <div class="hero-bottom">
+        <span class="live"><i class="dot" id="dot"></i><span id="runState">Loading…</span></span>
+        <div class="row">
+          <button class="small-btn" id="previewBtn">Preview on desktop</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="right">
+      <section class="panel">
+        <h2 class="section-title">Your reminder rhythm</h2>
+        <p class="hint">Pick a repeating interval or a few exact times. Everything stays on this computer.</p>
+
+        <label class="field-label" for="name">What should he call you? (optional)</label>
+        <input class="control" id="name" maxlength="30" placeholder="Your name">
+
+        <div class="mode">
+          <button id="intervalMode">Every interval</button>
+          <button id="timesMode">Specific times</button>
+        </div>
+
+        <div id="intervalFields">
+          <label class="field-label" for="interval">Remind me every</label>
+          <select class="control" id="interval">
+            <option value="1">1 minute (for testing)</option>
+            <option value="15">15 minutes</option>
+            <option value="20">20 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">1 hour</option>
+            <option value="90">1 hour 30 minutes</option>
+            <option value="120">2 hours</option>
+            <option value="180">3 hours</option>
+          </select>
+          <div class="two">
+            <div><label class="field-label" for="start">Start of day</label><input class="control" type="time" id="start"></div>
+            <div><label class="field-label" for="end">Wind down</label><input class="control" type="time" id="end"></div>
+          </div>
+        </div>
+
+        <div id="timesFields" hidden>
+          <label class="field-label" for="times">Reminder times</label>
+          <input class="control" id="times" placeholder="09:00, 11:00, 13:00, 15:00">
+          <div class="note" id="timesNote">24-hour times, separated by commas.</div>
+        </div>
+
+        <div class="two">
+          <div>
+            <label class="field-label" for="snooze">"Remind me later" waits</label>
+            <select class="control" id="snooze">
+              <option value="5">5 minutes</option>
+              <option value="10">10 minutes</option>
+              <option value="15">15 minutes</option>
+              <option value="30">30 minutes</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="goal">Daily goal (glasses)</label>
+            <input class="control" type="number" id="goal" min="1" max="30">
+          </div>
+        </div>
+
+        <div class="toggles">
+          <label class="toggle"><input type="checkbox" id="sound"> Play a soft chime</label>
+          <label class="toggle"><input type="checkbox" id="pauseWhenAway"> Wait while I'm away</label>
+          <label class="toggle"><input type="checkbox" id="nativeNotify"> Also show Windows notification</label>
+          <label class="toggle"><input type="checkbox" id="launchAtLogin"> Start with Windows</label>
+        </div>
+
+        <button class="primary" id="toggleBtn">Start reminders</button>
+      </section>
+
+      <section class="panel">
+        <h2 class="section-title">Today's little wins</h2>
+        <p class="hint">Every sip counts.</p>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">Glasses today</div>
+            <div class="stat-value"><span id="count">0</span> <small>/ <span id="goalLabel">8</span></small></div>
+            <div class="progress"><i id="progress"></i></div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Next nudge</div>
+            <div class="stat-value" id="next">—</div>
+          </div>
+        </div>
+        <div class="sips" id="sips"></div>
+        <div class="stats-actions">
+          <button class="small-btn" id="drankBtn">+ I drank water</button>
+          <button class="small-btn" id="undoBtn">Undo last</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script src="character.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

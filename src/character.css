@@ -1,0 +1,54 @@
+.hydra-guy { display: block; width: 100%; height: 100%; overflow: visible; }
+.hydra-guy g { transform-box: view-box; }
+
+.hg-body { transform-origin: 100px 345px; }
+.hg-head { transform-origin: 100px 98px; transition: transform .4s ease; }
+.hg-arm-l { transform-origin: 63px 124px; }
+.hg-arm-r { transform-origin: 137px 124px; }
+.hg-arm-l, .hg-arm-r, .hg-bottle { transition: transform .55s cubic-bezier(.34, 1.4, .5, 1); }
+.hg-leg-l { transform-origin: 89px 206px; }
+.hg-leg-r { transform-origin: 111px 206px; }
+.hg-bottle { transform-origin: 63px 212px; }
+.hg-eyes { transform-origin: 100px 66px; animation: hg-blink 4.8s infinite; }
+.hg-mouth-open { opacity: 0; }
+
+.is-happy .hg-mouth { opacity: 0; }
+.is-happy .hg-mouth-open { opacity: 1; }
+
+.is-idle .hg-body { animation: hg-bob 3.2s ease-in-out infinite; }
+.is-idle .hg-head { animation: hg-tilt 6.4s ease-in-out infinite; }
+
+.is-walking .hg-body { animation: hg-step .42s ease-in-out infinite; }
+.is-walking .hg-leg-l { animation: hg-swing .42s ease-in-out infinite alternate; }
+.is-walking .hg-leg-r { animation: hg-swing .42s ease-in-out infinite alternate-reverse; }
+.is-walking .hg-arm-l { animation: hg-arm .42s ease-in-out infinite alternate-reverse; }
+.is-walking .hg-arm-r { animation: hg-arm .42s ease-in-out infinite alternate; }
+
+.is-waving .hg-arm-r { animation: hg-wave 1.7s ease-in-out 1; }
+.is-waving .hg-head { transform: rotate(3deg); }
+
+.is-cheers .hg-arm-l { transform: rotate(140deg); }
+.is-cheers .hg-bottle { transform: rotate(-140deg); }
+.is-cheers .hg-body { animation: hg-hop .5s ease-out 2; }
+.is-cheers .hg-head { transform: rotate(-4deg); }
+
+@keyframes hg-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+@keyframes hg-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes hg-tilt { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(2.5deg); } }
+@keyframes hg-step {
+  0%, 100% { transform: translateY(0) rotate(var(--lean, 0deg)); }
+  50% { transform: translateY(-5px) rotate(var(--lean, 0deg)); }
+}
+@keyframes hg-swing { from { transform: rotate(13deg); } to { transform: rotate(-13deg); } }
+@keyframes hg-arm { from { transform: rotate(12deg); } to { transform: rotate(-12deg); } }
+@keyframes hg-wave {
+  0% { transform: rotate(0); }
+  20%, 50%, 80% { transform: rotate(-152deg); }
+  35%, 65% { transform: rotate(-122deg); }
+  100% { transform: rotate(0); }
+}
+@keyframes hg-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hydra-guy * { animation: none !important; transition: none !important; }
+}

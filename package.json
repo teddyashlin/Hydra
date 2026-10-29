@@ -1,0 +1,41 @@
+{
+  "name": "hydra-water-reminder",
+  "productName": "Hydra",
+  "version": "1.0.0",
+  "description": "A desktop companion that walks onto your screen and reminds you to drink water.",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "preview": "electron . --preview",
+    "icon": "node scripts/make-icon.js",
+    "dist": "node scripts/make-icon.js && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.hydra.waterreminder",
+    "productName": "Hydra",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0"
+  }
+}
